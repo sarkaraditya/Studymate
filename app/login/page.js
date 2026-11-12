@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Logo from '@/components/Logo';
@@ -10,7 +10,6 @@ function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-  const urlError = searchParams.get('error');
 
   const [tab, setTab]           = useState('signin');
   const [name, setName]         = useState('');
@@ -19,20 +18,6 @@ function AuthForm() {
   const [confirm, setConfirm]   = useState('');
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
-
-  useEffect(() => {
-    if (urlError) {
-      if (urlError === 'CredentialsSignin') {
-        setError('Incorrect email or password. Please try again.');
-      } else if (urlError === 'Configuration') {
-        setError('Google sign-in is not configured yet. Please sign in with Email & Password.');
-      } else if (urlError === 'UntrustedHost') {
-        setError('Connection host error. Please refresh and try again.');
-      } else {
-        setError(`Sign-in error: ${urlError}`);
-      }
-    }
-  }, [urlError]);
 
   function switchTab(t) {
     setTab(t);
@@ -78,8 +63,6 @@ function AuthForm() {
         // Map generic NextAuth error codes to friendly messages
         if (res.error === 'CredentialsSignin') {
           setError('Incorrect email or password. Please try again.');
-        } else if (res.error === 'UntrustedHost') {
-          setError('Host connection error. Please refresh and try again.');
         } else {
           setError(res.error);
         }
@@ -88,30 +71,7 @@ function AuthForm() {
         router.refresh();
       }
     } catch {
-      setError('Something went wrong. Please check your credentials and try again.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleDemoSignIn() {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await signIn('email-password', {
-        email: 'student@example.com',
-        password: 'student123',
-        redirect: false,
-        callbackUrl,
-      });
-      if (res?.error) {
-        setError('Demo sign-in failed. Please try again.');
-      } else {
-        router.push(callbackUrl);
-        router.refresh();
-      }
-    } catch {
-      setError('Something went wrong with demo sign-in.');
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -119,13 +79,7 @@ function AuthForm() {
 
   async function handleGoogle() {
     setLoading(true);
-    setError('');
-    try {
-      await signIn('google', { callbackUrl });
-    } catch {
-      setError('Google sign-in is not configured. Please use Email & Password.');
-      setLoading(false);
-    }
+    await signIn('google', { callbackUrl });
   }
 
   return (
@@ -239,17 +193,6 @@ function AuthForm() {
         >
           <Icon n="google" size={18} />
           <span>Continue with Google</span>
-        </button>
-
-        <button
-          className="btn out gbtn"
-          type="button"
-          onClick={handleDemoSignIn}
-          disabled={loading}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'var(--tint)' }}
-        >
-          <Icon n="user" size={18} />
-          <span>⚡ Instant Demo Student Sign-In</span>
         </button>
 
         <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--muted)', margin: 0 }}>

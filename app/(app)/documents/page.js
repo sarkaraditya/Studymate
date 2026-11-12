@@ -124,7 +124,7 @@ export default function Documents() {
         </label>
       </div>
 
-      <div className="card card-pad">
+      <div className="card" style={{ padding: '18px 22px' }}>
         <div className="tools">
           {TYPES.map((t) => (
             <button

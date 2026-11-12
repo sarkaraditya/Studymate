@@ -4,24 +4,13 @@ import { useEffect, useState } from 'react';
 import Icon from '@/components/Icon';
 import { api } from '@/lib/ask';
 
-const fmtDate = (d) => {
-  try {
-    return new Date(d).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return d;
-  }
-};
+const fmt = (d) => new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 export default function History() {
   const [items, setItems] = useState(null);
-  const [filter, setFilter] = useState('all'); // 'all', 'notes', 'quizzes', 'plans'
+  const [filter, setFilter] = useState('all'); // 'all', 'notes', 'chats'
   const [q, setQ] = useState('');
   const [err, setErr] = useState('');
-  const [activeMenuId, setActiveMenuId] = useState(null);
 
   useEffect(() => {
     let live = true;
@@ -44,192 +33,169 @@ export default function History() {
     };
   }, [filter, q]);
 
-  async function removeItem(item) {
-    if (!confirm(`Delete "${item.title}"? This cannot be undone.`)) return;
+  async function removeChat(id, title) {
+    if (!confirm(`Delete chat "${title}"? This cannot be undone.`)) return;
     try {
-      if (item.itemType === 'note') {
-        await api(`/api/notes/${item.id}`, { method: 'DELETE' });
-      } else if (item.itemType === 'chat') {
-        await api(`/api/conversations/${item.id}`, { method: 'DELETE' });
-      } else if (item.itemType === 'quiz') {
-        await api(`/api/quizzes/${item.id}`, { method: 'DELETE' });
-      } else if (item.itemType === 'plan') {
-        await api(`/api/planner/${item.id}`, { method: 'DELETE' });
-      }
-      setItems((l) => l.filter((x) => x.id !== item.id));
-      setActiveMenuId(null);
+      await api(`/api/conversations/${id}`, { method: 'DELETE' });
+      setItems((l) => l.filter((x) => x.id !== id));
     } catch (e) {
       setErr(e.message);
     }
   }
 
-  const getItemLink = (item) => {
-    if (item.itemType === 'note') return `/notes?id=${item.id}`;
-    if (item.itemType === 'chat') return `/tutor?c=${item.id}`;
-    if (item.itemType === 'quiz') return `/quizzes?id=${item.id}`;
-    if (item.itemType === 'plan') return `/planner`;
-    return '/notes';
-  };
+  async function removeNote(id, title) {
+    if (!confirm(`Delete note "${title}"? This cannot be undone.`)) return;
+    try {
+      await api(`/api/notes/${id}`, { method: 'DELETE' });
+      setItems((l) => l.filter((x) => x.id !== id));
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
 
   return (
     <>
-      {/* Top Banner matching Screen 4 in mockup */}
-      <div className="card lib-banner">
-        <div className="lib-banner-icon">
-          <Icon n="notes" size={26} />
-        </div>
+      <div className="mhead">
         <div>
-          <h1 className="lib-banner-title">Your Notes</h1>
-          <p className="lib-banner-sub">Access and organize all your notes in one place.</p>
+          <h1>History</h1>
+          <p>Your saved study notes and AI Tutor chat history, stored in the database.</p>
         </div>
       </div>
 
-      {/* Category Pills matching Screen 4 in mockup */}
-      <div className="lib-tools">
-        <div className="lib-pills">
-          <button
-            className={'pill' + (filter === 'all' ? ' on' : '')}
-            onClick={() => setFilter('all')}
-          >
-            All
-          </button>
-          <button
-            className={'pill' + (filter === 'notes' ? ' on' : '')}
-            onClick={() => setFilter('notes')}
-          >
-            Notes
-          </button>
-          <button
-            className={'pill' + (filter === 'quizzes' ? ' on' : '')}
-            onClick={() => setFilter('quizzes')}
-          >
-            Quizzes
-          </button>
-          <button
-            className={'pill' + (filter === 'plans' ? ' on' : '')}
-            onClick={() => setFilter('plans')}
-          >
-            Plans
-          </button>
+      <div className="card" style={{ padding: '18px 22px' }}>
+        <div className="tools" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className={'pill' + (filter === 'all' ? ' on' : '')}
+              onClick={() => setFilter('all')}
+            >
+              All History
+            </button>
+            <button
+              className={'pill' + (filter === 'notes' ? ' on' : '')}
+              onClick={() => setFilter('notes')}
+            >
+              Notes History
+            </button>
+            <button
+              className={'pill' + (filter === 'chats' ? ' on' : '')}
+              onClick={() => setFilter('chats')}
+            >
+              Tutor Chats
+            </button>
+          </div>
+
+          <label className="search" style={{ marginLeft: 0, minWidth: 240 }}>
+            <Icon n="search" size={16} />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search chats and notes…"
+              aria-label="Search history"
+            />
+          </label>
         </div>
 
-        <label className="search" style={{ margin: 0 }}>
-          <Icon n="search" size={16} />
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search notes, quizzes & plans…"
-            aria-label="Search"
-          />
-        </label>
-      </div>
+        {err && <p role="alert" style={{ color: 'var(--pdfc)', marginBottom: 12 }}>{err}</p>}
 
-      {err && <p role="alert" style={{ color: 'var(--pdfc)', marginBottom: 12 }}>{err}</p>}
+        {items === null ? (
+          <div className="empty">Loading history from database…</div>
+        ) : items.length === 0 ? (
+          <div className="empty">
+            {q
+              ? 'No history matches your search.'
+              : filter === 'notes'
+              ? 'No saved notes yet. Create a note in the Notes section or save an answer from the AI Tutor.'
+              : filter === 'chats'
+              ? 'No chats yet. Ask the AI Tutor anything and your conversations will be stored here.'
+              : 'No history yet. Start asking questions or writing notes to see them here.'}
+          </div>
+        ) : (
+          items.map((item) => (
+            <div key={item.id} className="hrow">
+              <span
+                className="av"
+                style={{
+                  background: item.itemType === 'note' ? 'var(--tint2)' : 'var(--tint)',
+                  color: 'var(--brand)',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon n={item.itemType === 'note' ? 'notes' : 'chat'} />
+              </span>
 
-      {items === null ? (
-        <div className="empty">Loading your library…</div>
-      ) : items.length === 0 ? (
-        <div className="empty">
-          {q
-            ? 'No matches found.'
-            : filter === 'notes'
-            ? 'No saved notes yet. Start writing or save an answer from AI Tutor!'
-            : filter === 'quizzes'
-            ? 'No practice quizzes yet. Create your first quiz!'
-            : filter === 'plans'
-            ? 'No study sessions scheduled yet.'
-            : 'No items in your library yet.'}
-        </div>
-      ) : (
-        <div className="lib-list">
-          {items.map((item) => (
-            <div key={item.id} className="card lib-card" style={{ position: 'relative' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <Link
-                  href={getItemLink(item)}
-                  style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
-                >
-                  <b className="lib-card-title">{item.title || 'Untitled Note'}</b>
-                  <div className="lib-card-meta">
-                    <Icon n="cal" size={13} />
-                    <span>{fmtDate(item.createdAt || item.updatedAt)}</span>
-                  </div>
-                  <p className="lib-card-snippet">
-                    {item.content || 'Tap to view details and open note…'}
-                  </p>
-                </Link>
-              </div>
-
-              {/* 3-dots Menu matching Screen 4 */}
-              <div style={{ position: 'relative' }}>
-                <button
-                  className="iconbtn"
-                  aria-label="Item options"
-                  onClick={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
-                  style={{ color: 'var(--muted)', padding: '6px' }}
-                >
-                  <Icon n="dots" size={18} />
-                </button>
-
-                {activeMenuId === item.id && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      right: 0,
-                      top: '100%',
-                      zIndex: 30,
-                      background: 'var(--surface)',
-                      border: '1px solid var(--line)',
-                      borderRadius: 10,
-                      padding: '4px',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-                      minWidth: 120,
-                    }}
+              {item.itemType === 'note' ? (
+                <>
+                  <Link className="t" href={`/notes?id=${item.id}`}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <b>{item.title || 'Untitled Note'}</b>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: 'var(--tint)',
+                          color: 'var(--brand)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Note
+                      </span>
+                    </div>
+                    <span>
+                      {item.content ? item.content.slice(0, 90) + (item.content.length > 90 ? '…' : '') : 'Empty note'} • {fmt(item.updatedAt)}
+                    </span>
+                  </Link>
+                  <Link className="btn out" href={`/notes?id=${item.id}`}>
+                    Open Note
+                  </Link>
+                  <button
+                    className="btn danger"
+                    aria-label={`Delete note ${item.title}`}
+                    onClick={() => removeNote(item.id, item.title)}
                   >
-                    <Link
-                      href={getItemLink(item)}
-                      style={{
-                        display: 'block',
-                        padding: '8px 12px',
-                        fontSize: 13,
-                        color: 'var(--ink)',
-                        textDecoration: 'none',
-                        borderRadius: 6,
-                      }}
-                      onClick={() => setActiveMenuId(null)}
-                    >
-                      Open
-                    </Link>
-                    <button
-                      onClick={() => removeItem(item)}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '8px 12px',
-                        fontSize: 13,
-                        color: 'var(--pdfc)',
-                        background: 'none',
-                        border: 0,
-                        cursor: 'pointer',
-                        borderRadius: 6,
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link className="t" href={`/tutor?c=${item.id}`}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <b>{item.title}</b>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: 'var(--tint2)',
+                          color: 'var(--brand)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Chat
+                      </span>
+                    </div>
+                    <span>
+                      {item._count?.messages || 0} messages • {fmt(item.updatedAt)}
+                    </span>
+                  </Link>
+                  <Link className="btn out" href={`/tutor?c=${item.id}`}>
+                    Open Chat
+                  </Link>
+                  <button
+                    className="btn danger"
+                    aria-label={`Delete chat ${item.title}`}
+                    onClick={() => removeChat(item.id, item.title)}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Floating Action Button (+) matching Screen 4 in mockup */}
-      <Link href="/notes" className="fab" aria-label="Create new note" title="New Note">
-        <Icon n="plus" size={24} />
-      </Link>
+          ))
+        )}
+      </div>
     </>
   );
 }

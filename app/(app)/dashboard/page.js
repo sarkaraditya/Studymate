@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Icon from '@/components/Icon';
 import { api } from '@/lib/ask';
 
-const DEFAULT_GOALS = ['Solve 10 MCQs'];
+const DEFAULT_GOALS = ['Revise CPU Scheduling', 'Solve 10 MCQs', 'Make short notes'];
 const fmt = (d) => new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /* ── Slide-up modal ── */
@@ -204,9 +204,9 @@ export default function Dashboard() {
   const user = session?.user;
   const name = user?.name?.split(' ')[0] || 'there';
   const STATS = [
-    { icon: 'chat',   value: stats?.chats     ?? 0, label: 'Chats', action: 'Viewed →', modal: 'chats' },
-    { icon: 'layers', value: stats?.questions  ?? 0, label: 'Questions', action: 'Asked →', modal: 'questions' },
-    { icon: 'notes',  value: stats?.notes      ?? 0, label: 'Notes', action: 'Saved →', href: '/notes' },
+    { icon: 'chat',   value: stats?.chats     ?? '–', label: 'Chats',          modal: 'chats' },
+    { icon: 'layers', value: stats?.questions  ?? '–', label: 'Questions Asked', modal: 'questions' },
+    { icon: 'notes',  value: stats?.notes      ?? '–', label: 'Notes Saved',     href: '/notes' },
   ];
 
   return (
@@ -217,27 +217,39 @@ export default function Dashboard() {
       {modal === 'chats'     && <ChatsModal     onClose={() => setModal(null)} />}
       {modal === 'questions' && <QuestionsModal onClose={() => setModal(null)} />}
 
-      <div className="dash-hero">
-        <span className="dash-sub">Welcome back,</span>
-        <h1 className="dash-title">{name} 👋</h1>
-        <p className="dash-desc">Your notes and chat history are synced with your account.</p>
+      <div className="mhead">
+        <div>
+          <h1>Welcome back, {name} 👋</h1>
+          <p>Your notes and chat history are synced with your account.</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <button className="iconbtn" aria-label="Notifications"><Icon n="bell" /></button>
+          {user?.image ? (
+            <img src={user.image} alt={user.name || 'Account'} className="avatar" style={{ objectFit: 'cover' }} />
+          ) : (
+            <span className="avatar" aria-label="Account">{name[0].toUpperCase()}</span>
+          )}
+        </div>
       </div>
 
       <div className="stats">
-        {STATS.map(({ icon, value, label, action, modal: m, href }) => {
+        {STATS.map(({ icon, value, label, modal: m, href }) => {
           const isClickable = !!(m || href);
           const inner = (
             <>
-              <span className="stat-ic"><Icon n={icon} /></span>
-              <b className="stat-val">{value}</b>
-              <span className="stat-sub">
-                {label} <span className="stat-act">{action}</span>
-              </span>
+              <Icon n={icon} />
+              <b>{value}</b>
+              <span>{label}</span>
+              {isClickable && (
+                <span style={{ fontSize: 11, color: 'var(--brand)', fontWeight: 600, marginTop: 2 }}>
+                  View all →
+                </span>
+              )}
             </>
           );
           if (href) {
             return (
-              <Link key={label} href={href} className="card stat" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link key={label} href={href} className="card stat" style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
                 {inner}
               </Link>
             );
@@ -247,7 +259,7 @@ export default function Dashboard() {
               key={label}
               className="card stat"
               onClick={() => m && setModal(m)}
-              style={{ cursor: isClickable ? 'pointer' : 'default', background: 'var(--surface)', border: '1px solid var(--line)', textAlign: 'left', width: '100%', display: 'flex', flexDirection: 'column' }}
+              style={{ cursor: isClickable ? 'pointer' : 'default', background: 'none', border: '1px solid var(--line)', textAlign: 'left', width: '100%', display: 'block', borderRadius: 14 }}
               aria-label={`View ${label}`}
             >
               {inner}
@@ -256,29 +268,28 @@ export default function Dashboard() {
         })}
       </div>
 
-      <div className="two">
+      <div className="two" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
         <div className="card cont">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>Continue Learning</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h2 style={{ margin: 0, fontSize: 18 }}>Continue Learning</h2>
             <Link href="/history" style={{ fontSize: 13, color: 'var(--brand)', textDecoration: 'none', fontWeight: 600 }}>
               All History →
             </Link>
           </div>
           <Link className="in" href={stats?.recent ? `/tutor?c=${stats.recent.id}` : '/tutor'}>
             <span className="play"><Icon n="play" /></span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <b style={{ display: 'block', fontSize: 15, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {stats?.recent ? stats.recent.title : 'Start a new chat'}
-              </b>
-              <small style={{ color: 'var(--muted)', fontSize: 13 }}>
-                Pick up your last conversation
+            <span>
+              <b>{stats?.recent ? stats.recent.title : 'Start a new chat'}</b>
+              <br />
+              <small style={{ color: 'var(--muted)' }}>
+                {stats?.recent ? 'Pick up your last conversation' : 'Ask the AI Tutor anything'}
               </small>
-            </div>
+            </span>
             <span className="go"><Icon n="arrow" size={18} /></span>
           </Link>
         </div>
 
-        <div className="card cont recent-note-card">
+        <div className="card cont">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <h2 style={{ margin: 0, fontSize: 18 }}>Recent Note</h2>
             <Link href="/notes" style={{ fontSize: 13, color: 'var(--brand)', textDecoration: 'none', fontWeight: 600 }}>
