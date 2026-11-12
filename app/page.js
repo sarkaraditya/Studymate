@@ -226,7 +226,7 @@ export default function Home() {
           <span>Home</span>
         </Link>
         <a href="#features" className="mobile-nav-item">
-          <Icon n="spark" size={20} />
+          <Icon n="grid" size={20} />
           <span>Features</span>
         </a>
         <Link href="/login" className="mobile-nav-item">

@@ -612,6 +612,79 @@ export default function QuizzesPage() {
       {/* VIEW: QUIZZES LIBRARY LIST */}
       {view === 'list' && (
         <>
+          {/* Header Card matching Screen 5 in mockup */}
+          <div className="quiz-hero-card">
+            <div className="quiz-hero-icon">
+              <Icon n="check" size={24} />
+            </div>
+            <div className="quiz-hero-body">
+              <h2>Practice Quiz</h2>
+              <p>Test your knowledge with AI-generated quizzes.</p>
+            </div>
+          </div>
+
+          {/* Quiz Preview Card matching Screen 5 */}
+          <div className="card quiz-preview-card">
+            <div className="quiz-preview-stats">
+              <div className="quiz-preview-stat-left">
+                <b>{quizzes?.[0]?.total || 10}</b>
+                <span>Questions</span>
+              </div>
+              <div className="quiz-preview-stat-right">
+                <Icon n="clock" size={16} />
+                <span>~ 10 min</span>
+              </div>
+            </div>
+
+            <button
+              className="btn pri"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '13px 18px',
+                fontSize: 15,
+                fontWeight: 700,
+                borderRadius: 12,
+              }}
+              onClick={() => {
+                if (quizzes && quizzes.length > 0) {
+                  loadAndStartQuiz(quizzes[0].id);
+                } else {
+                  setView('create');
+                }
+              }}
+            >
+              Start Quiz <Icon n="arrow" size={16} />
+            </button>
+          </div>
+
+          {/* Quiz Features Section matching Screen 5 */}
+          <div className="quiz-features-section">
+            <div className="quiz-features-title">Quiz Features:</div>
+            <div className="quiz-features-list">
+              <div className="quiz-feature-item">
+                <Icon n="check" size={16} />
+                <span>Adaptive difficulty</span>
+              </div>
+              <div className="quiz-feature-item">
+                <Icon n="check" size={16} />
+                <span>Instant feedback</span>
+              </div>
+              <div className="quiz-feature-item">
+                <Icon n="check" size={16} />
+                <span>Detailed explanations</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ height: 1, background: 'var(--line)', margin: '24px 0 20px' }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <h3 style={{ fontSize: 17, margin: 0, fontWeight: 700 }}>Your Practice Tests</h3>
+            <button className="btn out" style={{ padding: '6px 12px', fontSize: 13 }} onClick={() => setView('create')}>
+              <Icon n="plus" size={14} /> New Quiz
+            </button>
+          </div>
           {quizzes === null ? (
             <div className="card empty">Loading your quizzes…</div>
           ) : quizzes.length === 0 ? (

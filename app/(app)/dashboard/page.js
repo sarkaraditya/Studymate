@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Icon from '@/components/Icon';
 import { api } from '@/lib/ask';
 
-const DEFAULT_GOALS = ['Revise CPU Scheduling', 'Solve 10 MCQs', 'Make short notes'];
+const DEFAULT_GOALS = ['Solve 10 MCQs'];
 const fmt = (d) => new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /* ── Slide-up modal ── */
@@ -278,7 +278,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="card cont">
+        <div className="card cont recent-note-card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <h2 style={{ margin: 0, fontSize: 18 }}>Recent Note</h2>
             <Link href="/notes" style={{ fontSize: 13, color: 'var(--brand)', textDecoration: 'none', fontWeight: 600 }}>
