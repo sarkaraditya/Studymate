@@ -2,56 +2,31 @@ import Link from 'next/link';
 import Icon from '@/components/Icon';
 import Logo from '@/components/Logo';
 
+// 3 quick action items matching Screen 2 in reference image
 const QUICK_LINKS = [
   ['chat', 'Ask Questions', '/tutor'],
   ['doc', 'Chat with PDFs', '/documents'],
   ['notes', 'Generate Notes', '/notes'],
-  ['quiz', 'Practice Quizzes', '/quizzes'],
-  ['cal', 'Study Planner', '/planner'],
 ];
 
 const DETAILED_FEATURES = [
   {
     icon: 'chat',
     title: 'AI Study Tutor',
-    desc: 'Ask complex doubts, get step-by-step breakdowns, and receive crystal-clear explanations with real-world analogies, code snippets, and mathematical steps.',
+    desc: 'Ask complex doubts, get step-by-step breakdowns, and receive crystal-clear explanations.',
     link: '/tutor',
-    action: 'Ask a question',
   },
   {
     icon: 'doc',
     title: 'Chat with PDFs & Notes',
-    desc: 'Upload your syllabus, lecture slides, research papers, or PDF notes. StudyMate extracts text and answers questions strictly based on your actual study materials.',
+    desc: 'Upload your syllabus, lecture slides, or research papers.',
     link: '/documents',
-    action: 'Upload documents',
   },
   {
     icon: 'notes',
     title: 'Persistent Notes Database',
-    desc: 'Save tutor answers directly into your personal notes with one click. Organize, search, and edit your notes with full revision timestamps stored in your database.',
+    desc: 'Save tutor answers directly into your personal notes.',
     link: '/notes',
-    action: 'Explore notes',
-  },
-  {
-    icon: 'clock',
-    title: 'Sync & Complete History',
-    desc: 'Log in with your Google account to access your full learning timeline. Review past conversations, saved notes, and questions anytime on any device.',
-    link: '/history',
-    action: 'Check history',
-  },
-  {
-    icon: 'quiz',
-    title: 'Exam Practice & Quizzes',
-    desc: 'Test your retention before tests. Generate practice questions, multiple-choice quizzes, and flashcards directly from your uploaded documents and notes.',
-    link: '/quizzes',
-    action: 'Practice questions',
-  },
-  {
-    icon: 'cal',
-    title: 'Smart Study Planner',
-    desc: 'Keep your academic goals on schedule with daily checklists, study timers, milestone tracking, and prioritized revision topics.',
-    link: '/planner',
-    action: 'Plan your study',
   },
 ];
 
@@ -85,8 +60,10 @@ export default function Home() {
           <a href="#about">About</a>
         </nav>
         <span className="sp" />
-        <Link className="btn" href="/login">Log in</Link>
-        <Link className="btn pri" href="/login">Get Started</Link>
+        <div className="top-actions">
+          <Link className="btn" href="/login">Log in</Link>
+          <Link className="btn pri" href="/login">Get Started</Link>
+        </div>
       </header>
 
       {/* Hero Section */}
@@ -127,34 +104,36 @@ export default function Home() {
         </svg>
       </section>
 
-      {/* Quick shortcuts */}
+      {/* Quick shortcuts (3 items matching Screen 2 in reference image) */}
       <section className="feats" aria-label="Quick Navigation">
         {QUICK_LINKS.map(([ic, label, href]) => (
-          <Link key={href} href={href}>
+          <Link key={href} href={href} className="feat-pill-link">
             <span className="ic"><Icon n={ic} /></span>
-            {label}
+            <span>{label}</span>
           </Link>
         ))}
       </section>
 
-      {/* Detailed Features Section */}
-      <section id="features" style={{ paddingTop: 40 }}>
+      {/* Detailed Features Section matching Screen 3 in reference image */}
+      <section id="features" style={{ paddingTop: 30 }}>
         <div className="sec-head">
           <h2>Everything You Need to Ace Your Studies</h2>
           <p>Built with generative AI and designed to give you deep comprehension, active recall, and effortless note organization.</p>
         </div>
         <div className="feat-grid">
           {DETAILED_FEATURES.map((f) => (
-            <div key={f.title} className="card feat-card">
+            <Link key={f.title} href={f.link} className="card feat-card">
               <div className="ic-wrap">
-                <Icon n={f.icon} size={24} />
+                <Icon n={f.icon} size={22} />
               </div>
-              <h3>{f.title}</h3>
-              <p>{f.desc}</p>
-              <Link href={f.link}>
-                {f.action} <Icon n="arrow" size={14} />
-              </Link>
-            </div>
+              <div className="feat-card-body">
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+              </div>
+              <div className="feat-card-arrow">
+                <Icon n="arrow" size={16} />
+              </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -239,6 +218,26 @@ export default function Home() {
           <span className="footer-copy" suppressHydrationWarning>© {new Date().getFullYear()} StudyMate AI. Built for students.</span>
         </div>
       </footer>
+
+      {/* Mobile 4-Item Bottom Navigation Bar matching Screen 2 in reference image */}
+      <nav className="mobile-bottom-nav">
+        <Link href="/" className="mobile-nav-item on">
+          <Icon n="home" size={20} />
+          <span>Home</span>
+        </Link>
+        <a href="#features" className="mobile-nav-item">
+          <Icon n="spark" size={20} />
+          <span>Features</span>
+        </a>
+        <Link href="/login" className="mobile-nav-item">
+          <Icon n="book" size={20} />
+          <span>Library</span>
+        </Link>
+        <Link href="/login" className="mobile-nav-item">
+          <Icon n="user" size={20} />
+          <span>Profile</span>
+        </Link>
+      </nav>
     </>
   );
 }
