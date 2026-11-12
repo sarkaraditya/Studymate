@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import Icon from '@/components/Icon';
 import LandingHeader from '@/components/LandingHeader';
+import Logo from '@/components/Logo';
 
 // 3 quick action items matching Screen 2 in reference image
 const QUICK_LINKS = [
