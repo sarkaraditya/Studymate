@@ -196,8 +196,8 @@ export default function Shell({ children }) {
         </Link>
 
         <Link
-          href="/tutor"
-          className={'mobile-nav-item ' + (path === '/tutor' ? 'on' : '')}
+          href="/features"
+          className={'mobile-nav-item ' + (path === '/features' ? 'on' : '')}
         >
           <Icon n="grid" size={20} />
           <span>Features</span>

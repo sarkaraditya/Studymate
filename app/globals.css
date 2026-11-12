@@ -167,6 +167,9 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 }
 
 @media (max-width: 860px) {
+  .desktop-top {
+    display: none !important;
+  }
   .hero {
     grid-template-columns: 1fr;
   }

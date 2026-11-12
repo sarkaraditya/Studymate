@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 import Icon from '@/components/Icon';
-import Logo from '@/components/Logo';
+import LandingHeader from '@/components/LandingHeader';
 
 // 3 quick action items matching Screen 2 in reference image
 const QUICK_LINKS = [
@@ -48,23 +50,15 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  if (session?.user) {
+    redirect('/dashboard');
+  }
+
   return (
     <>
-      <header className="top">
-        <Logo />
-        <nav>
-          <a className="on" href="#">Home</a>
-          <a href="#features">Features</a>
-          <a href="#how">How it Works</a>
-          <a href="#about">About</a>
-        </nav>
-        <span className="sp" />
-        <div className="top-actions">
-          <Link className="btn" href="/login">Log in</Link>
-          <Link className="btn pri" href="/login">Get Started</Link>
-        </div>
-      </header>
+      <LandingHeader />
 
       {/* Hero Section */}
       <section className="hero">
