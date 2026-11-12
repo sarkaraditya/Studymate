@@ -14,7 +14,7 @@ const googleSecret = process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT
 // does NOT log anyone out.
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'studymate-production-fallback-auth-secret-32-chars-long',
   adapter: PrismaAdapter(prisma),
   // Use JWT strategy (required for Credentials provider) but we also store
   // sessions in the DB via the adapter for durability.
