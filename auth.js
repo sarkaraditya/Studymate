@@ -13,16 +13,22 @@ const googleSecret = process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT
 // session record is stored in SQLite — so quitting and restarting the dev server
 // does NOT log anyone out.
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   // Use JWT strategy (required for Credentials provider) but we also store
   // sessions in the DB via the adapter for durability.
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 }, // 30 days
   providers: [
-    Google({
-      clientId: googleId,
-      clientSecret: googleSecret,
-      allowDangerousEmailAccountLinking: true,
-    }),
+    ...(googleId && googleSecret
+      ? [
+          Google({
+            clientId: googleId,
+            clientSecret: googleSecret,
+            allowDangerousEmailAccountLinking: true,
+          }),
+        ]
+      : []),
     // Email + password sign-in. Sign-up is handled by /api/auth/register.
     Credentials({
       id: 'email-password',

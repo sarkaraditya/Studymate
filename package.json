@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:migrate-to-cloud": "node scripts/migrate-to-cloud.mjs"
+    "db:migrate-to-cloud": "node scripts/migrate-to-cloud.mjs",
+    "db:reset-password": "node scripts/reset-password.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.0",
