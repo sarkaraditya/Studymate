@@ -35,6 +35,6 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[register]', err);
-    return NextResponse.json({ error: 'Registration failed. Please try again.' }, { status: 500 });
+    return NextResponse.json({ error: 'Registration failed. Please try again.', details: err?.message || String(err) }, { status: 500 });
   }
 }
