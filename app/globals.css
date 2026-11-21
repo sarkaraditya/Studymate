@@ -9,7 +9,7 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}.logo:hover{text-decoration:none}
 .logo svg{color:var(--brand);width:26px;height:26px}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 16px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink)}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:var(--on)}
@@ -84,14 +84,14 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .quiz-item{padding:20px;display:flex;flex-direction:column;gap:10px}
 @media (max-width:768px){.about-grid{grid-template-columns:1fr}.feats{grid-template-columns:repeat(3,1fr)}}
 /* app shell */
-.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.shell{display:grid;grid-template-columns:230px 1fr;height:100vh;overflow:hidden}
 .side{background:var(--surface);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
 .side .logo{padding:0 10px 18px}
 .side a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:500;font-size:14px}
 .side a:hover{background:var(--bg)}
 .side a.on{background:var(--tint);color:var(--brand);font-weight:600}
 .side .sp{flex:1}
-.main{padding:28px 36px;min-width:0}
+.main{padding:28px 36px;min-width:0;overflow:auto;height:100vh}
 .mhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
 .mhead h1{margin:0;font-size:26px;letter-spacing:-.01em;font-weight:800}
 .mhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
@@ -116,7 +116,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .goals input{width:18px;height:18px;accent-color:var(--brand)}
 .goals input:checked+span{text-decoration:line-through;color:var(--muted)}
 /* tutor */
-.tutor{display:flex;flex-direction:column;height:100vh;padding-bottom:20px}
+.tutor{display:flex;flex-direction:column;height:100%;padding-bottom:20px}
 .chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:18px;padding:6px 0 14px}
 .msg{display:flex;gap:12px;max-width:100%}
 .msg.u{justify-content:flex-end}
@@ -152,8 +152,8 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .shell{grid-template-columns:1fr}
 .side{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px;border-right:0;border-bottom:1px solid var(--line)}
 .side .logo,.side .sp,.side .set span{display:none}.side a{white-space:nowrap}
-.main{padding:20px 16px}.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}
-.tutor{height:calc(100vh - 62px)}.search{margin-left:0;width:100%}
+.main{padding:20px 16px;overflow:auto;height:calc(100vh - 62px)}.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}
+.tutor{height:100%}.search{margin-left:0;width:100%}
 }
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 /* auth + sidebar user */

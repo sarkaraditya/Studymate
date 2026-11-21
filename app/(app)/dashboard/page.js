@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import Icon from '@/components/Icon';
 import { api } from '@/lib/ask';
 
@@ -159,6 +159,17 @@ export default function Dashboard() {
   const { data: session } = useSession();
   const [stats, setStats] = useState(null);
   const [modal, setModal] = useState(null); // 'chats' | 'questions' | null
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // Load persisted goals from localStorage
   useEffect(() => {
@@ -224,11 +235,34 @@ export default function Dashboard() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button className="iconbtn" aria-label="Notifications"><Icon n="bell" /></button>
-          {user?.image ? (
-            <img src={user.image} alt={user.name || 'Account'} className="avatar" style={{ objectFit: 'cover' }} />
-          ) : (
-            <span className="avatar" aria-label="Account">{name[0].toUpperCase()}</span>
-          )}
+          <div ref={profileRef} style={{ position: 'relative' }}>
+            <button
+              className="iconbtn"
+              aria-label="Profile menu"
+              onClick={() => setProfileOpen((o) => !o)}
+              style={{ padding: 0, borderRadius: '50%' }}
+            >
+              {user?.image ? (
+                <img src={user.image} alt={user?.name || 'Account'} className="avatar" style={{ objectFit: 'cover', display: 'block' }} />
+              ) : (
+                <span className="avatar" aria-hidden="true">{name[0].toUpperCase()}</span>
+              )}
+            </button>
+            {profileOpen && (
+              <div className="profile-dropdown">
+                <div className="profile-dropdown-info">
+                  <div style={{ minWidth: 0 }}>
+                    <b style={{ display: 'block', fontSize: 14 }}>{user?.name || 'Student'}</b>
+                    <small style={{ color: 'var(--muted)', fontSize: 12, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</small>
+                  </div>
+                </div>
+                <div className="profile-dropdown-divider" />
+                <button className="profile-dropdown-btn" onClick={() => signOut({ callbackUrl: '/' })}>
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
